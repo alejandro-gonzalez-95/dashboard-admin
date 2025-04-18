@@ -16,9 +16,13 @@ const videoPlayer = ref(null)
 const canvas = ref(null)
 const aspectRatio = ref(0)
 const thumbnail = ref(null)
+const time = ref(0)
+const type = ref('')
 
 defineExpose({
   thumbnail,
+  time,
+  type,
 })
 
 const cropAreaStyles = computed(() => ({
@@ -52,6 +56,8 @@ onMounted(() => {
 
     ctx.drawImage(videoPlayer.value, 0, 0, canvas.width, canvas.height)
     thumbnail.value = canvas.toDataURL('image/png') // Convierte el frame en imagen
+    time.value = videoPlayer.value.duration
+    type.value = videoPlayer.value.currentSrc
     // URL.revokeObjectURL(videoFile.value)
   }
 })

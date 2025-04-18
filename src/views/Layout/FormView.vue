@@ -99,16 +99,23 @@ const removeSectionImage = (sectionId, sectionImageId) => {
 }
 
 //TODO: Agregar para video
-const selectImage = async (fileUrl, thumbnail, sectionId, sectionImageId) => {
+const handleSelectImage = async (fileUrl, thumbnail, sectionId, sectionImageId, type, time) => {
+  console.log('type', type)
   if (fileUrl) {
-    const img = await getFileFromDataURL(fileUrl, `${uuidv4()}.png`, 'image/png')
+    console.log('fileUrl', fileUrl)
+    const extension = type.split('/')[1]
+    const file = await getFileFromDataURL(fileUrl, `${uuidv4()}.${extension}`, type)
+
+    console.log('file', file)
 
     layout.value.sections.forEach((section) => {
       if (section.id === sectionId) {
         section.sectionImages.forEach((sectionImage) => {
           if (sectionImage.id === sectionImageId) {
             sectionImage.thumbnailUrl = thumbnail
-            sectionImage.image = img
+            sectionImage.image = file
+            sectionImage.time = time ? Math.round(time) : sectionImage.time
+            sectionImage.type = type.split('/')[0]
           }
         })
       }
@@ -132,7 +139,7 @@ const handleSubmit = async () => {
 
   const files = getAllImages(layout)
   files.forEach((file) =>
-    formData.append(`img-${file.sectionId}-${file.sectionImageId}`, file.image),
+    formData.append(`file-${file.sectionId}-${file.sectionImageId}`, file.image),
   )
 
   await sendRequest(formData, layout)
@@ -146,6 +153,7 @@ const getAllImages = (layout) => {
   return (
     layout.value.sections.flatMap((section) =>
       section.sectionImages.map((sectionImage) => {
+        console.log('sectionImage', sectionImage.image)
         return { sectionId: section.id, sectionImageId: sectionImage.id, image: sectionImage.image }
       }),
     ) || []
@@ -217,7 +225,7 @@ const getAllImages = (layout) => {
             class="flex items-center gap-3 w-full"
           >
             <FileSelector
-              :handleSelectImage="selectImage"
+              :handleSelectImage="handleSelectImage"
               :genericImage="genericImage"
               :sectionId="section.id"
               :sectionImageId="sectionImage.id"

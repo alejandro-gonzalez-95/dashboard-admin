@@ -11,6 +11,10 @@ const section1CurrentImage = ref(null)
 const section2CurrentImage = ref(null)
 const section3CurrentImage = ref(null)
 
+let section1CurrentType = ref(null)
+let section2CurrentType = ref(null)
+let section3CurrentType = ref(null)
+
 let section1CurrentImagePosition = 0
 let section2CurrentImagePosition = 0
 let section3CurrentImagePosition = 0
@@ -41,6 +45,7 @@ const getImages = async () => {
         time: sectionImageData.time,
         name: sectionImageData.file.name,
         image: image,
+        type: sectionImageData.type,
       }
 
       section.sectionImages.push(sectionImage)
@@ -79,14 +84,17 @@ const setNextImage = async (sectionId) => {
 
   if (section.position === 1) {
     section1CurrentImage.value = currentSectionImage.image
+    section1CurrentType.value = currentSectionImage.type
     section1CurrentImagePosition = newCurrentImagePosition
   }
   if (section.position === 2) {
     section2CurrentImage.value = currentSectionImage.image
+    section2CurrentType.value = currentSectionImage.type
     section2CurrentImagePosition = newCurrentImagePosition
   }
   if (section.position === 3) {
     section3CurrentImage.value = currentSectionImage.image
+    section3CurrentType.value = currentSectionImage.type
     section3CurrentImagePosition = newCurrentImagePosition
   }
 
@@ -102,7 +110,21 @@ const setNextImage = async (sectionId) => {
       :style="{ aspectRatio: 16 / 9 }"
       class="w-full bg-red-100 outline outline-2 outline-gray-400"
     >
-      <img :src="section1CurrentImage" class="object-cover w-full" />
+      <img
+        v-if="section1CurrentType == 'image'"
+        :src="section1CurrentImage"
+        class="object-cover w-full"
+      />
+      <video
+        v-if="section1CurrentType == 'video'"
+        ref="videoPlayer"
+        controls
+        :src="section1CurrentImage"
+        @play="onPlay"
+        @pause="onPause"
+        class="video-player"
+        :style="videoPlayerStyles"
+      ></video>
     </div>
 
     <div v-if="layoutType === '2'" class="flex w-full h-full outline outline-2 outline-gray-400">

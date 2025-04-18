@@ -18,6 +18,7 @@ const fileInput = useTemplateRef('fileInput')
 const isModalOpen = ref(false)
 const fileType = ref('')
 const fileSrc = ref('')
+const fileTypeComplete = ref('')
 const imageCropperRef = ref(null)
 const videoCropperRef = ref(null)
 
@@ -37,6 +38,7 @@ const handleButtonClick = () => {
 
 const inputOnChange = (event) => {
   if (event.target.files && event.target.files.length > 0) {
+    fileTypeComplete.value = event.target.files[0].type
     fileType.value = event.target.files[0].type.split('/')[0]
     console.log('fileType', fileType.value)
     if (fileType.value === 'image') {
@@ -56,10 +58,18 @@ const onComplete = () => {
   console.log('onComplete', imageCropperRef.value)
   if (imageCropperRef.value) {
     const croppedImage = imageCropperRef.value.getResult().canvas.toDataURL()
-    handleSelectImage(croppedImage, croppedImage, sectionId, sectionImageId)
+    handleSelectImage(croppedImage, croppedImage, sectionId, sectionImageId, 'image/png')
   } else {
     const thumbnailUrl = videoCropperRef.value.thumbnail
-    handleSelectImage(fileSrc.value, thumbnailUrl, sectionId, sectionImageId)
+    const time = videoCropperRef.value.time
+    handleSelectImage(
+      fileSrc.value,
+      thumbnailUrl,
+      sectionId,
+      sectionImageId,
+      fileTypeComplete.value,
+      time,
+    )
   }
   closeModal()
 }
